@@ -1,0 +1,7 @@
+main: com.zp4rker.diskit.Diskit
+
+name: Diskit
+version: ${version}
+author: zp4rker
+description: A simple Discord -> Bukkit bridge.
+api-version: 1.16

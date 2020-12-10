@@ -1,0 +1,35 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+}
+
+group 'com.zp4rker'
+version '1.0.0-release'
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url = "https://repo.codemc.org/repository/maven-public" }
+    maven { url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots" }
+}
+
+dependencies {
+    shadow "org.jetbrains.kotlin:kotlin-stdlib"
+    shadow "com.zp4rker:bukkot:1.4.20.1-release"
+    shadow "org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT"
+    compile "net.dv8tion:JDA:4.2.0_222"
+}
+
+shadowJar {
+    archiveClassifier.set("")
+
+    configurations = [project.configurations.compile]
+}
+
+build.dependsOn "shadowJar"
+
+processResources {
+    filesMatching("**plugin.yml") {
+        expand("version": project.version)
+    }
+}

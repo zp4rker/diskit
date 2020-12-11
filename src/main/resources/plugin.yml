@@ -5,9 +5,9 @@ version: ${version}
 author: zp4rker
 description: A simple Discord -> Bukkit bridge.
 api-version: 1.16
-depend: [Bukkot]
+depend: [Bukkot, Vault]
 
 commands:
   link:
     description: The command used to link your Minecraft account to your Discord account.
-    usage: /link <username#0000 | userId>
+    usage: '§2[Correct Usage]: §7/link <username#0000 | userId>'

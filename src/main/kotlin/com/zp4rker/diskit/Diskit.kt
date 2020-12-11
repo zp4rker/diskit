@@ -2,10 +2,10 @@ package com.zp4rker.diskit
 
 import com.zp4rker.discore.API
 import com.zp4rker.discore.command.CommandHandler
-import com.zp4rker.discore.extenstions.event.on
 import com.zp4rker.diskit.command.LinkCommand
+import com.zp4rker.diskit.listener.PlayerJoinListener
+import com.zp4rker.diskit.listener.UserNickname
 import net.dv8tion.jda.api.JDABuilder
-import net.dv8tion.jda.api.events.ReadyEvent
 import net.dv8tion.jda.api.hooks.InterfacedEventManager
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.cache.CacheFlag
@@ -15,15 +15,25 @@ import org.bukkit.plugin.java.JavaPlugin
 /**
  * @author zp4rker
  */
+
+lateinit var PLUGIN: Diskit
+lateinit var DCMDHANDLER: CommandHandler
+
 class Diskit : JavaPlugin() {
 
     override fun onEnable() {
+        PLUGIN = this
+
+        AccountLinker.cacheRunnable.runTaskTimer(this, 0, 20 * 60 * 5)
+
         // MC side of things
         initMetrics().let {
             logger.info("Metrics is ${if (it.isEnabled) "enabled" else "disabled"}.")
         }
+
         saveDefaultConfig()
-        registerCommands()
+        bukkitCommands()
+        bukkitListeners()
 
         // Discord side of things
         if (config.getString("bot-settings.token", "token.here") == "token.here") {
@@ -39,20 +49,31 @@ class Diskit : JavaPlugin() {
 
             build()
         }
+        DCMDHANDLER = CommandHandler(config.getString("bot-settings.prefix", "!")!!)
 
-        with(CommandHandler(config.getString("bot-settings.prefix", "!")!!)) {
-            /* register commands here */
-        }
+        discordListeners()
+    }
 
-        API.on<ReadyEvent> {
-            logger.info("Discord bot now ready!")
-        }
+    override fun onDisable() {
+        AccountLinker.flushCache()
     }
 
     private fun initMetrics() = Metrics(this, 9607)
 
-    private fun registerCommands() {
-        getCommand("link")?.setExecutor(LinkCommand())
+    private fun bukkitCommands() {
+        LinkCommand()
+    }
+
+    private fun bukkitListeners() {
+        PlayerJoinListener()
+    }
+
+    private fun discordCommands() {
+        /* register commands here */
+    }
+
+    private fun discordListeners() {
+        UserNickname()
     }
 
 }

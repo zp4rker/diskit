@@ -1,4 +1,4 @@
-package com.zp4rker.diskit.listener
+package com.zp4rker.diskit.listener.dsc
 
 import com.zp4rker.discore.API
 import com.zp4rker.discore.extenstions.event.on

@@ -1,4 +1,4 @@
-package com.zp4rker.diskit.command
+package com.zp4rker.diskit.command.mc
 
 import com.zp4rker.discore.API
 import com.zp4rker.discore.extenstions.embed

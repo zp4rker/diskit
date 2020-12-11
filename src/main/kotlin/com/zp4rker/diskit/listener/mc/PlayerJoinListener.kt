@@ -1,4 +1,4 @@
-package com.zp4rker.diskit.listener
+package com.zp4rker.diskit.listener.mc
 
 import com.zp4rker.diskit.AccountLinker
 import com.zp4rker.diskit.PLUGIN

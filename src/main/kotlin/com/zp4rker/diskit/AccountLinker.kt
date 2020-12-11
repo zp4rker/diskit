@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.User
 import net.milkbowl.vault.permission.Permission
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import java.util.*
@@ -17,12 +18,13 @@ object AccountLinker {
 
     private val cache = mutableMapOf<UUID, String>()
 
-    fun link(player: Player, user: User) {
+    fun link(player: OfflinePlayer, user: User) {
         cache[player.uniqueId] = user.id
         sync(player)
     }
 
-    fun sync(player: Player) {
+    fun sync(oPlayer: OfflinePlayer) {
+        val player = oPlayer.player ?: return
         val user = searchUser(player) ?: return
         val guild = API.getGuildById(PLUGIN.config.getString("bot-settings.server-id", "")!!) ?: return
         val member = guild.getMember(user) ?: return
@@ -42,7 +44,7 @@ object AccountLinker {
         }
     }
 
-    fun searchUser(player: Player): User? {
+    fun searchUser(player: OfflinePlayer): User? {
         return API.getUserById(cache.getOrElse(player.uniqueId) {
             PLUGIN.reloadConfig()
             val search = PLUGIN.config.getString("linked-users.${player.uniqueId}") ?: return null
@@ -53,8 +55,8 @@ object AccountLinker {
         })
     }
 
-    fun searchPlayer(user: User): Player? {
-        return cache.keys.find { cache[it] == user.id }?.let { Bukkit.getPlayer(it) } ?: run {
+    fun searchPlayer(user: User): OfflinePlayer? {
+        return cache.keys.find { cache[it] == user.id }?.let { Bukkit.getOfflinePlayer(it) } ?: run {
             PLUGIN.reloadConfig()
             val linkedUsers = PLUGIN.config.getConfigurationSection("linked-users") ?: return null
 
@@ -66,12 +68,12 @@ object AccountLinker {
 
             if (cache.size >= 100) flushCache()
             cache[uuid] = user.id
-            Bukkit.getPlayer(uuid)
+            Bukkit.getOfflinePlayer(uuid)
         }
     }
 
-    fun flushCache() {
-        if (cache.size < 10) return
+    fun flushCache(force: Boolean = false) {
+        if (cache.size < 10 && !force) return
 
         for (entry in cache) {
             PLUGIN.config.set("linked-users.${entry.key}", entry.value)

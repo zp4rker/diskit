@@ -2,9 +2,10 @@ package com.zp4rker.diskit
 
 import com.zp4rker.discore.API
 import com.zp4rker.discore.command.CommandHandler
-import com.zp4rker.diskit.command.LinkCommand
-import com.zp4rker.diskit.listener.PlayerJoinListener
-import com.zp4rker.diskit.listener.UserNickname
+import com.zp4rker.diskit.command.dsc.AdminLinkCommand
+import com.zp4rker.diskit.command.mc.LinkCommand
+import com.zp4rker.diskit.listener.mc.PlayerJoinListener
+import com.zp4rker.diskit.listener.dsc.UserNickname
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.hooks.InterfacedEventManager
 import net.dv8tion.jda.api.requests.GatewayIntent
@@ -27,13 +28,13 @@ class Diskit : JavaPlugin() {
         AccountLinker.cacheRunnable.runTaskTimer(this, 0, 20 * 60 * 5)
 
         // MC side of things
-        initMetrics().let {
-            logger.info("Metrics is ${if (it.isEnabled) "enabled" else "disabled"}.")
-        }
-
         saveDefaultConfig()
         bukkitCommands()
         bukkitListeners()
+
+        if (config.getBoolean("metrics-enabled", true)) initMetrics().let {
+            logger.info("Metrics is ${if (it.isEnabled) "enabled" else "disabled"}.")
+        }
 
         // Discord side of things
         if (config.getString("bot-settings.token", "token.here") == "token.here") {
@@ -52,10 +53,11 @@ class Diskit : JavaPlugin() {
         DCMDHANDLER = CommandHandler(config.getString("bot-settings.prefix", "!")!!)
 
         discordListeners()
+        discordCommands()
     }
 
     override fun onDisable() {
-        AccountLinker.flushCache()
+        AccountLinker.flushCache(true)
     }
 
     private fun initMetrics() = Metrics(this, 9607)
@@ -69,7 +71,7 @@ class Diskit : JavaPlugin() {
     }
 
     private fun discordCommands() {
-        /* register commands here */
+        AdminLinkCommand()
     }
 
     private fun discordListeners() {

@@ -1,3 +1,4 @@
+metrics-enabled: true
 bot-settings:
   token: 'token.here'
   prefix: '!'
